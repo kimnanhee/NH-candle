@@ -27,11 +27,15 @@
 #include <avr/interrupt.h>
 #include <util/delay.h>
 #include <stdio.h>
+#include <string.h>
 
 #include "ADC.h"
 #include "DHT11.h"
 #include "lcd.h"
 #include "uart.h"
+
+int uart_finish=0, uart_i=0, uart_state=0;
+char uart_buff[50];
 
 int main(void)
 {
@@ -51,8 +55,10 @@ int main(void)
 	char buff[50];
 	
 	int cds_value; // CDS ADC값 저장
-	char sound_value; 
+	char sound_value; // sound 센서 값 저장
 	uint8_t I_RH, D_RH, I_Temp, D_Temp, CheckSum;
+	
+	int time_cnt=0; // 0.1초마다 cnt++, 2초마다 DHT 센서값을 읽어오기 위해서 사용
 	
     while (1) 
     {
@@ -62,27 +68,53 @@ int main(void)
 		if(sound_value == 0x00) mode++;
 		if(mode > 3) mode = 1;
 		
-		Request();		 //시작 펄스 신호 보냄
-		Response();		 //센서로부터 응답 받음
-		I_RH=Receive_data();	 //습도의 정수 부분
-		D_RH=Receive_data();	 //습도의 실수 부분
-		I_Temp=Receive_data();	 //온도의 정수 부분
-		D_Temp=Receive_data();	 //온도의 실수 부분
-		CheckSum=Receive_data(); //모든 세그먼트의 체크섬
+		sprintf(buff, "mode %d", mode); // LCD에 현재 모드 출력
+		LCD_wString(buff);
 		
-		if ((I_RH + D_RH + I_Temp + D_Temp) != CheckSum) sprintf(buff, "error");
-		else
+		if(time_cnt >= 20) // 2초마다 DHT센서값 측정
 		{
-			sprintf("T%2d.%d H%2d.%d C%4d M%1d", I_Temp, D_Temp, I_RH, D_RH, cds_value, mode);
-			uart_string(buff);
+			Request();		 //시작 펄스 신호 보냄
+			Response();		 //센서로부터 응답 받음
+			I_RH=Receive_data();	 //습도의 정수 부분
+			D_RH=Receive_data();	 //습도의 실수 부분
+			I_Temp=Receive_data();	 //온도의 정수 부분
+			D_Temp=Receive_data();	 //온도의 실수 부분
+			CheckSum=Receive_data(); //모든 세그먼트의 체크섬
+			
+			if ((I_RH + D_RH + I_Temp + D_Temp) != CheckSum) // DHT 센서값 측정 오류
+			{
+				I_Temp = D_Temp = I_RH = D_RH = -1;
+				sprintf(buff, "error");
+				uart_string(buff);
+			}
+			time_cnt = 0;
 		}
-		_delay_ms(3000); // 2초 이상 쉬어야 센서에서 맞는 값을 읽어올 수 있다
+		
+		sprintf("T%2d.%d H%2d.%d C%4d M%1d", I_Temp, D_Temp, I_RH, D_RH, cds_value, mode);
+		uart_string(buff);
+		
+		_delay_ms(100); // 0.1초 딜레이
+		time_cnt++;
     }
 }
 ISR(USART0_RX_vect)
 {
 	unsigned char buff = UDR0; // UDR0에 레지스터에 데이터가 저장
 	
-	if(buff == 0x02);
-	else if(buff == 0x03);
+	if(buff == 0x02)
+	{
+		uart_state = 1;
+		memset(uart_buff, 0, strlen(uart_buff));
+		uart_i = 0;
+		return;
+	}
+	else if(buff == 0x03)
+	{
+		uart_state = 0;
+	}
+	
+	if(uart_state)
+	{
+		uart_buff[uart_i++] = buff;
+	}
 }
