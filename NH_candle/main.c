@@ -33,6 +33,9 @@
 #include "DHT11.h"
 #include "lcd.h"
 #include "uart.h"
+#include "RGB.h"
+
+int set_R = 0, set_G = 0, set_B = 0;
 
 int uart_finish=0, uart_i=0, uart_state=0;
 char uart_buff[50];
@@ -48,30 +51,47 @@ int main(void)
 	
 	LCD_Init();
 	ADC_set();
+	pwm_init();
 	uart_init(BAUDRATE(9600));
 	sei();
 	
-	int mode = 1;
-	char buff[50];
+	int mode = 1; // 모드 저장
+	char buff[50]; // LCD 출력 문자열, uart 송신 문자열 저장
 	
 	int cds_value; // CDS ADC값 저장
-	char sound_value; // sound 센서 값 저장
+	char touch_value; // touch 센서 값 저장
 	uint8_t I_RH, D_RH, I_Temp, D_Temp, CheckSum;
 	
 	int time_cnt=0; // 0.1초마다 cnt++, 2초마다 DHT 센서값을 읽어오기 위해서 사용
 	
     while (1) 
     {
-		cds_value = ADC_read(0);
-		sound_value = (PINF & 0x02);
+		if(uart_finish)
+		{
+			if(uart_buff[0] == 'M') mode = uart_buff[1]-'0'; // M[ ].(mode)
+			else if(uart_buff[0] == 'S') // S[][][].(red,green,blue)
+			{
+				set_R = (uart_buff[1]-'0')*100 + (uart_buff[2]-'0')*10 + (uart_buff[3]-'0');
+				set_G = (uart_buff[4]-'0')*100 + (uart_buff[5]-'0')*10 + (uart_buff[6]-'0');
+				set_B = (uart_buff[7]-'0')*100 + (uart_buff[8]-'0')*10 + (uart_buff[9]-'0');
+			}
+			uart_finish = 0;
+		}
 		
-		if(sound_value == 0x00) mode++;
+		cds_value = ADC_read(0); // cds ADC 값 측정
+		touch_value = (PINF & 0x02); // 
+		
+		if(touch_value == 0x02) {
+			mode++;
+			_delay_ms(100);
+		}
 		if(mode > 3) mode = 1;
 		
 		sprintf(buff, "mode %d", mode); // LCD에 현재 모드 출력
+		LCD_setcursor(0, 0);
 		LCD_wString(buff);
 		
-		if(time_cnt >= 20) // 2초마다 DHT센서값 측정
+		if(time_cnt >= 200) // 2초마다 DHT센서값 측정
 		{
 			Request();		 //시작 펄스 신호 보냄
 			Response();		 //센서로부터 응답 받음
@@ -85,15 +105,36 @@ int main(void)
 			{
 				I_Temp = D_Temp = I_RH = D_RH = -1;
 				sprintf(buff, "error");
+				
+				(buff);
+			}
+			else
+			{
+				sprintf(buff, "%d.%d %d.%d %d  ", I_Temp, D_Temp, I_RH, D_RH, cds_value);
+				LCD_setcursor(1, 0);
+				LCD_wString(buff);
+				
+				sprintf(buff, "T%2d.%d H%2d.%d C%4d M%1d", I_Temp, D_Temp, I_RH, D_RH, cds_value, mode); // 온도, 습도, 조도, 모드
 				uart_string(buff);
 			}
 			time_cnt = 0;
 		}
 		
-		sprintf("T%2d.%d H%2d.%d C%4d M%1d", I_Temp, D_Temp, I_RH, D_RH, cds_value, mode);
-		uart_string(buff);
+		if(mode == 1) // 모드 1 RGB LED 출력
+		{
+			if(I_Temp > 30) pwm_led(255, 0, 0);
+			else if(I_Temp > 25) pwm_led(0, 255, 0);
+			else pwm_led(0, 0, 255);
+		}
+		else if(mode == 2) // 모드 2 RGB LED 출력
+		{
+			if(cds_value > 800) pwm_led(0, 0, 255);
+			else if(cds_value > 600) pwm_led(0, 255, 0);
+			else pwm_led(255, 0, 0);
+		}
+		else if(mode == 3) pwm_led(set_R, set_G, set_B); // 모드 3 RGB LED 출력
 		
-		_delay_ms(100); // 0.1초 딜레이
+		_delay_ms(10); // 0.01초 딜레이
 		time_cnt++;
     }
 }
@@ -103,7 +144,7 @@ ISR(USART0_RX_vect)
 	
 	if(buff == 0x02)
 	{
-		uart_state = 1;
+		uart_state = 1; // uart로 데이터 수신 상태
 		memset(uart_buff, 0, strlen(uart_buff));
 		uart_i = 0;
 		return;
@@ -111,6 +152,7 @@ ISR(USART0_RX_vect)
 	else if(buff == 0x03)
 	{
 		uart_state = 0;
+		uart_finish = 1; // uart로 데이터 수신 완료
 	}
 	
 	if(uart_state)
