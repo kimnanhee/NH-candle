@@ -78,7 +78,7 @@ background-color: rgb(156, 156, 156);</string>
      </rect>
     </property>
     <property name="currentIndex">
-     <number>0</number>
+     <number>2</number>
     </property>
     <widget class="QWidget" name="page_value">
      <widget class="QLabel" name="label_temp">
@@ -221,7 +221,7 @@ font: 12pt &quot;Arial&quot;;</string>
        </rect>
       </property>
      </widget>
-     <widget class="QPushButton" name="pushButton_set_2">
+     <widget class="QPushButton" name="pushButton_RGB">
       <property name="geometry">
        <rect>
         <x>260</x>

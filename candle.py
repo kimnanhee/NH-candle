@@ -80,11 +80,11 @@ class Ui_MainWindow(object):
         self.textEdit_B = QtWidgets.QTextEdit(self.page_set)
         self.textEdit_B.setGeometry(QtCore.QRect(430, 170, 100, 50))
         self.textEdit_B.setObjectName("textEdit_B")
-        self.pushButton_set_2 = QtWidgets.QPushButton(self.page_set)
-        self.pushButton_set_2.setGeometry(QtCore.QRect(260, 290, 120, 40))
-        self.pushButton_set_2.setStyleSheet("font: 75 12pt \"Arial\";\n"
+        self.pushButton_RGB = QtWidgets.QPushButton(self.page_set)
+        self.pushButton_RGB.setGeometry(QtCore.QRect(260, 290, 120, 40))
+        self.pushButton_RGB.setStyleSheet("font: 75 12pt \"Arial\";\n"
 "background-color: rgb(156, 156, 156);")
-        self.pushButton_set_2.setObjectName("pushButton_set_2")
+        self.pushButton_RGB.setObjectName("pushButton_RGB")
         self.pushButton_R = QtWidgets.QPushButton(self.page_set)
         self.pushButton_R.setGeometry(QtCore.QRect(100, 100, 120, 50))
         self.pushButton_R.setStyleSheet("background-color: rgb(211, 211, 211);\n"
@@ -122,7 +122,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(0)
+        self.stackedWidget.setCurrentIndex(1)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -137,7 +137,7 @@ class Ui_MainWindow(object):
         self.label_humi_value.setText(_translate("MainWindow", "TextLabel"))
         self.label_cds.setText(_translate("MainWindow", "CDS"))
         self.label_cds_value.setText(_translate("MainWindow", "TextLabel"))
-        self.pushButton_set_2.setText(_translate("MainWindow", "Set"))
+        self.pushButton_RGB.setText(_translate("MainWindow", "Set"))
         self.pushButton_R.setText(_translate("MainWindow", "R"))
         self.pushButton_G.setText(_translate("MainWindow", "G"))
         self.pushButton_B.setText(_translate("MainWindow", "B"))
