@@ -39,46 +39,76 @@ class Ui_MainWindow(object):
         self.page_value = QtWidgets.QWidget()
         self.page_value.setObjectName("page_value")
         self.label_temp = QtWidgets.QLabel(self.page_value)
-        self.label_temp.setGeometry(QtCore.QRect(100, 100, 120, 50))
+        self.label_temp.setGeometry(QtCore.QRect(20, 100, 120, 50))
         self.label_temp.setStyleSheet("background-color: rgb(211, 211, 211);\n"
 "font: 12pt \"Arial\";")
         self.label_temp.setAlignment(QtCore.Qt.AlignCenter)
         self.label_temp.setObjectName("label_temp")
         self.label_humi = QtWidgets.QLabel(self.page_value)
-        self.label_humi.setGeometry(QtCore.QRect(260, 100, 120, 50))
+        self.label_humi.setGeometry(QtCore.QRect(180, 100, 120, 50))
         self.label_humi.setStyleSheet("background-color: rgb(211, 211, 211);\n"
 "font: 12pt \"Arial\";")
         self.label_humi.setAlignment(QtCore.Qt.AlignCenter)
         self.label_humi.setObjectName("label_humi")
         self.label_temp_value = QtWidgets.QLabel(self.page_value)
-        self.label_temp_value.setGeometry(QtCore.QRect(100, 170, 120, 30))
+        self.label_temp_value.setGeometry(QtCore.QRect(20, 170, 120, 30))
+        self.label_temp_value.setStyleSheet("font: 10pt \"Arial\";")
         self.label_temp_value.setAlignment(QtCore.Qt.AlignCenter)
         self.label_temp_value.setObjectName("label_temp_value")
         self.label_humi_value = QtWidgets.QLabel(self.page_value)
-        self.label_humi_value.setGeometry(QtCore.QRect(260, 170, 120, 30))
+        self.label_humi_value.setGeometry(QtCore.QRect(180, 170, 120, 30))
+        self.label_humi_value.setStyleSheet("font: 10pt \"Arial\";")
         self.label_humi_value.setAlignment(QtCore.Qt.AlignCenter)
         self.label_humi_value.setObjectName("label_humi_value")
         self.label_cds = QtWidgets.QLabel(self.page_value)
-        self.label_cds.setGeometry(QtCore.QRect(420, 100, 120, 50))
+        self.label_cds.setGeometry(QtCore.QRect(340, 100, 120, 50))
         self.label_cds.setStyleSheet("background-color: rgb(211, 211, 211);\n"
 "font: 12pt \"Arial\";")
         self.label_cds.setAlignment(QtCore.Qt.AlignCenter)
         self.label_cds.setObjectName("label_cds")
         self.label_cds_value = QtWidgets.QLabel(self.page_value)
-        self.label_cds_value.setGeometry(QtCore.QRect(420, 170, 120, 30))
+        self.label_cds_value.setGeometry(QtCore.QRect(340, 170, 120, 30))
+        self.label_cds_value.setStyleSheet("font: 10pt \"Arial\";")
         self.label_cds_value.setAlignment(QtCore.Qt.AlignCenter)
         self.label_cds_value.setObjectName("label_cds_value")
+        self.label_mode = QtWidgets.QLabel(self.page_value)
+        self.label_mode.setGeometry(QtCore.QRect(500, 100, 120, 50))
+        self.label_mode.setStyleSheet("background-color: rgb(211, 211, 211);\n"
+"font: 12pt \"Arial\";")
+        self.label_mode.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_mode.setObjectName("label_mode")
+        self.label_mode_value = QtWidgets.QLabel(self.page_value)
+        self.label_mode_value.setGeometry(QtCore.QRect(500, 170, 120, 30))
+        self.label_mode_value.setStyleSheet("font: 10pt \"Arial\";")
+        self.label_mode_value.setAlignment(QtCore.Qt.AlignCenter)
+        self.label_mode_value.setObjectName("label_mode_value")
+        self.plainTextEdit = QtWidgets.QPlainTextEdit(self.page_value)
+        self.plainTextEdit.setGeometry(QtCore.QRect(440, 320, 180, 100))
+        self.plainTextEdit.setReadOnly(True)
+        self.plainTextEdit.setObjectName("plainTextEdit")
         self.stackedWidget.addWidget(self.page_value)
         self.page_set = QtWidgets.QWidget()
         self.page_set.setObjectName("page_set")
         self.textEdit_R = QtWidgets.QTextEdit(self.page_set)
         self.textEdit_R.setGeometry(QtCore.QRect(110, 170, 100, 50))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        self.textEdit_R.setFont(font)
         self.textEdit_R.setObjectName("textEdit_R")
         self.textEdit_G = QtWidgets.QTextEdit(self.page_set)
         self.textEdit_G.setGeometry(QtCore.QRect(270, 170, 100, 50))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        self.textEdit_G.setFont(font)
         self.textEdit_G.setObjectName("textEdit_G")
         self.textEdit_B = QtWidgets.QTextEdit(self.page_set)
         self.textEdit_B.setGeometry(QtCore.QRect(430, 170, 100, 50))
+        font = QtGui.QFont()
+        font.setFamily("Arial")
+        font.setPointSize(10)
+        self.textEdit_B.setFont(font)
         self.textEdit_B.setObjectName("textEdit_B")
         self.pushButton_RGB = QtWidgets.QPushButton(self.page_set)
         self.pushButton_RGB.setGeometry(QtCore.QRect(260, 290, 120, 40))
@@ -103,7 +133,7 @@ class Ui_MainWindow(object):
         self.stackedWidget.addWidget(self.page_set)
         self.page_graph = QtWidgets.QWidget()
         self.page_graph.setObjectName("page_graph")
-        self.graphicsView = QtWidgets.QGraphicsView(self.page_graph)
+        self.graphicsView = PlotWidget(self.page_graph)
         self.graphicsView.setGeometry(QtCore.QRect(0, 0, 620, 450))
         self.graphicsView.setObjectName("graphicsView")
         self.stackedWidget.addWidget(self.page_graph)
@@ -122,7 +152,7 @@ class Ui_MainWindow(object):
         MainWindow.setStatusBar(self.statusbar)
 
         self.retranslateUi(MainWindow)
-        self.stackedWidget.setCurrentIndex(1)
+        self.stackedWidget.setCurrentIndex(0)
         QtCore.QMetaObject.connectSlotsByName(MainWindow)
 
     def retranslateUi(self, MainWindow):
@@ -137,10 +167,32 @@ class Ui_MainWindow(object):
         self.label_humi_value.setText(_translate("MainWindow", "TextLabel"))
         self.label_cds.setText(_translate("MainWindow", "CDS"))
         self.label_cds_value.setText(_translate("MainWindow", "TextLabel"))
+        self.label_mode.setText(_translate("MainWindow", "Mode"))
+        self.label_mode_value.setText(_translate("MainWindow", "TextLabel"))
+        self.plainTextEdit.setPlainText(_translate("MainWindow", "mode\n"
+"1 : temperature mode\n"
+"2 : humidity mode\n"
+"3 : user mode"))
+        self.textEdit_R.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Arial\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Gulim\'; font-size:9pt;\">0</span></p></body></html>"))
+        self.textEdit_G.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Arial\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Gulim\'; font-size:9pt;\">0</span></p></body></html>"))
+        self.textEdit_B.setHtml(_translate("MainWindow", "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.0//EN\" \"http://www.w3.org/TR/REC-html40/strict.dtd\">\n"
+"<html><head><meta name=\"qrichtext\" content=\"1\" /><style type=\"text/css\">\n"
+"p, li { white-space: pre-wrap; }\n"
+"</style></head><body style=\" font-family:\'Arial\'; font-size:10pt; font-weight:400; font-style:normal;\">\n"
+"<p style=\" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;\"><span style=\" font-family:\'Gulim\'; font-size:9pt;\">0</span></p></body></html>"))
         self.pushButton_RGB.setText(_translate("MainWindow", "Set"))
         self.pushButton_R.setText(_translate("MainWindow", "R"))
         self.pushButton_G.setText(_translate("MainWindow", "G"))
         self.pushButton_B.setText(_translate("MainWindow", "B"))
+from pyqtgraph import PlotWidget
 
 
 if __name__ == "__main__":

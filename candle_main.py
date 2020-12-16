@@ -8,8 +8,10 @@ from PyQt5.QtCore import pyqtSignal
 
 temp_list=[0] # 온도 저장 리스트
 humi_list=[0] # 습도 저장 리스트
+cds_list=[] # 조도 저장 리스트
 receive_temp = 0
 receive_humi = 0
+receive_cds = 0
 
 ser = serial.Serial( # 아두이노와 연결된 Serial 설정
     port='COM5', 
@@ -20,8 +22,8 @@ ser = serial.Serial( # 아두이노와 연결된 Serial 설정
     timeout=1)
 
 class draw_graph(QtWidgets.QMainWindow, Ui_MainWindow):
-    global temp_list, humi_list
-    global receive_temp, receive_humi
+    global temp_list, humi_list, cds_list
+    global receive_temp, receive_humi, receive_cds
     uiUpdateDelegate = pyqtSignal(int)
 
     def __init__(self, parent=None): # 설정 함수
@@ -39,10 +41,12 @@ class draw_graph(QtWidgets.QMainWindow, Ui_MainWindow):
             style=QtCore.Qt.DashLine, symbol=('o'), symbolBrush='r')
         self.graphicsView.plot(humi_list, pen=pg.mkPen('b', width=3), # 습도
             style=QtCore.Qt.DashLine, symbol='x', symbolBrush='b')
+        self.graphicsView.plot(cds_list, pen=pg.mkPen('g', width=3), # 조도
+            style=QtCore.Qt.DashLine, symbol='o', symbolBrush='g')
 
 def read_thread(ui):
-    global temp_list, humi_list # 글로벌 변수로 설정
-    global now_temp, now_humi
+    global temp_list, humi_list, cds_list # 글로벌 변수로 설정
+    global now_temp, now_humi, now_cds
     cnt = 0
     while True:
         data = ser.readline().decode('utf-8')  
@@ -52,27 +56,35 @@ def read_thread(ui):
             now_temp = temp
             humi = float(data[7:11]) # 습도 슬라이싱
             now_humi = humi
+            cds = int(data[13:17]) # 조도 슬라이싱
+            cds = int(cds/1024.0 * 100.0)
+            now_cds = cds
+            mode = data[19:20] # 모드 슬라이싱
 
-            ui.label_temp_value.setText(str(now_temp)) # 라벨에 온도 표시
-            ui.label_humi_value.setText(str(now_humi))
+            ui.label_temp_value.setText(str(now_temp)+'C') # 라벨에 온도 표시
+            ui.label_humi_value.setText(str(now_humi)+'%') # 라벨에 습도 표시
+            ui.label_cds_value.setText(str(now_cds)+'%') # 라벨에 조도 표시
+            ui.label_mode_value.setText(mode) # 라벨에 모드 표시
 
             temp_list.append(temp) # 리스트에 붙이기
             humi_list.append(humi)
+            cds_list.append(cds)
 
             cnt=cnt+1
             if(cnt>20): # 30개 데이터 자르기
                 temp_list.pop(0)
                 humi_list.pop(0)
+                cds_list.pop(0)
                 cnt=21
             ui.uiUpdateDelegate.emit(1) # updater 호출
 
 def send_value(self):
-    return
     r = int(self.textEdit_R.toPlainText()) # textEdit안의 값을 숫자로 변환
     g = int(self.textEdit_G.toPlainText())
     b = int(self.textEdit_B.toPlainText())
 
-    message = '\x02'+'{0:03d}{1:03d}{2:03d}'.format(r, g, b)+'\x03'
+    message = '\x02'+'S'+'{0:03d}{1:03d}{2:03d}'.format(r, g, b)+'\x03'
+    print(message)
     ser.write(bytes(message.encode()))
 
     self.textEdit_R.setText('0') # textEdit안의 값을 0으로 설정
@@ -91,13 +103,12 @@ draw_graph.send_value = send_value
 if __name__ == "__main__":
     import sys
     app = QtWidgets.QApplication(sys.argv)
-    MainWindow = QtWidgets.QMainWindow()
+    
     ui = draw_graph()
-    ui.setupUi(MainWindow)
     ui.signals()
     ui.send_value()
 
-    MainWindow.show()
+    ui.show()
 
     th = threading.Thread(target=read_thread, args=(ui,)) # 스레드 설정, read_thread함수에 인자로 ui를 넘겨준다
     th.daemon = True

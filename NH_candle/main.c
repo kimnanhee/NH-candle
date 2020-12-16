@@ -68,8 +68,7 @@ int main(void)
     {
 		if(uart_finish)
 		{
-			if(uart_buff[0] == 'M') mode = uart_buff[1]-'0'; // M[ ].(mode)
-			else if(uart_buff[0] == 'S') // S[][][].(red,green,blue)
+			if(uart_buff[0] == 'S') // S[][][].(red,green,blue)
 			{
 				set_R = (uart_buff[1]-'0')*100 + (uart_buff[2]-'0')*10 + (uart_buff[3]-'0');
 				set_G = (uart_buff[4]-'0')*100 + (uart_buff[5]-'0')*10 + (uart_buff[6]-'0');
@@ -83,7 +82,7 @@ int main(void)
 		
 		if(touch_value == 0x02) {
 			mode++;
-			_delay_ms(100);
+			_delay_ms(200);
 		}
 		if(mode > 3) mode = 1;
 		
@@ -105,8 +104,6 @@ int main(void)
 			{
 				I_Temp = D_Temp = I_RH = D_RH = -1;
 				sprintf(buff, "error");
-				
-				(buff);
 			}
 			else
 			{
