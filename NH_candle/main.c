@@ -7,7 +7,7 @@
  PD0 : DHT11
  
  PF0 : CDS
- PF1 : sound sensor
+ PF1 : touch sensor
  
  PB5 : R LED
  PB6 : G LED
