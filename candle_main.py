@@ -71,17 +71,20 @@ def read_thread(ui):
             ui.uiUpdateDelegate.emit(1) # updater 호출
 
 def send_value(self):
-    r = int(self.textEdit_R.toPlainText()) # textEdit안의 값을 숫자로 변환
-    g = int(self.textEdit_G.toPlainText())
-    b = int(self.textEdit_B.toPlainText())
+    try:
+        r = int(self.textEdit_R.toPlainText()) # textEdit안의 값을 숫자로 변환
+        g = int(self.textEdit_G.toPlainText())
+        b = int(self.textEdit_B.toPlainText())
+    except:
+        print("textEdit안의 값이 올바르지 않습니다.")
+    else:
+        message = '\x02'+'S'+'{0:03d}{1:03d}{2:03d}'.format(r, g, b)+'\x03' # UART로 보낼 RGB 값 포멧
+        print(message)
+        ser.write(bytes(message.encode())) # UART로 RGB 값 송신
 
-    message = '\x02'+'S'+'{0:03d}{1:03d}{2:03d}'.format(r, g, b)+'\x03' # UART로 보낼 RGB 값 포멧
-    print(message)
-    ser.write(bytes(message.encode())) # UART로 RGB 값 송신
-
-    self.textEdit_R.setText('0') # textEdit안의 값을 0으로 설정
-    self.textEdit_G.setText('0')
-    self.textEdit_B.setText('0')
+        self.textEdit_R.setText('0') # textEdit안의 값을 0으로 설정
+        self.textEdit_G.setText('0')
+        self.textEdit_B.setText('0')
 
 def signals(self):
     self.pushButton_value.clicked.connect(lambda : self.stackedWidget.setCurrentIndex(0)) # 페이지 전환
